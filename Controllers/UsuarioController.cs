@@ -7,6 +7,8 @@ using TelaLogin.Repository;
 using TelaLogin.Model;
 using System.Threading.Tasks;
 using System;
+using System.Net.Mail;
+using System.Security.Permissions;
 
 namespace TelaLogin.Controllers
 {
@@ -20,7 +22,7 @@ namespace TelaLogin.Controllers
             return Ok("oi");
         }
         [HttpGet("getUsuarios")]
-        public async Task<ActionResult> listarUsuario()
+        public async Task<ActionResult> ListarUsuario()
         {
             var resp = await UsuarioRepository.listarUsuarios();
             return Ok(resp);
@@ -28,7 +30,7 @@ namespace TelaLogin.Controllers
         }
 
         [HttpPost("cadastrar")]
-        public ActionResult salvar([FromBody] Usuario usuario)
+        public ActionResult Salvar([FromBody] Usuario usuario)
         {
             try
             {
@@ -48,19 +50,19 @@ namespace TelaLogin.Controllers
 
         }
         [HttpPut("alterar")]
-        public ActionResult alterar([FromBody] Usuario usuario)
+        public ActionResult Alterar([FromBody] Usuario usuario)
         {
-            var resp = UsuarioRepository.AlterarUsuario(usuario);           
+            var resp = UsuarioRepository.AlterarUsuario(usuario);
             if (resp > 0)
             {
                 return Ok("alterado com sucesso");
             }
             return Ok("não foi alterado");
-            
+
         }
 
         [HttpDelete("excluirUsuario/{id}")]
-        public ActionResult excluir(int id)
+        public ActionResult Excluir(int id)
         {
             int resp = (int)UsuarioRepository.ExcluirUsuario(id);
             if (resp > 0)
@@ -68,6 +70,14 @@ namespace TelaLogin.Controllers
                 return Ok("Excluido com sucesso");
             }
             return Ok("não foi Excluido");
+        }
+
+      
+        [HttpPost("logar")]
+        public ActionResult Logar([FromBody]LoginUsuario login)
+        {
+            var result = UsuarioRepository.VerificaLogin(login);
+            return Ok(new { login,token="testeToken",refreshToken="teste RefreshToken" } );
         }
 
     }

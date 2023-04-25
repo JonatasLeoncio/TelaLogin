@@ -55,5 +55,15 @@ namespace TelaLogin.Repository
             }
        
         }
+
+       static public object VerificaLogin(LoginUsuario login)
+        {
+            string sql = "select * from usuarios where email= @email and senha = @senha";
+            using (var conexao = new SQLiteConnection(stringDeConexao))
+            {
+              var result = conexao.Query(sql, login ).FirstOrDefault();
+              return result;
+            }
+        }
     }
 }
