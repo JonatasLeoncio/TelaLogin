@@ -17,7 +17,7 @@ namespace TelaLogin.Controllers
         [HttpGet("Ola")]
         public ActionResult Oi()
         {
-            return Ok("oi");
+            return Ok("ola");
         }
 
         [HttpGet("Listar")]
