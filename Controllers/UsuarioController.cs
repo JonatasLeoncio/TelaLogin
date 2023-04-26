@@ -15,7 +15,7 @@ namespace TelaLogin.Controllers
     public class UsuarioController : ControllerBase
     {
         [HttpGet("Ola")]
-        public ActionResult Oi()
+        public ActionResult Ola()
         {
             return Ok("ola");
         }
