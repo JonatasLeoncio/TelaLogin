@@ -3,9 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using TelaLogin.Model;
+//using static BCrypt.Net.BCrypt;
+
 
 namespace TelaLogin.Repository
 {
@@ -25,6 +26,11 @@ namespace TelaLogin.Repository
         }
         static public int salvarUsuario(Usuario usuario)
         {
+           
+           
+            usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha);
+          
+
             using (var conexao = new SQLiteConnection(stringDeConexao)) {
                 string sql = "insert into usuarios (nome, email, senha)values(@nome, @email, @senha)";
                 int linhasAfetadas = conexao.Execute(sql,usuario);
@@ -58,11 +64,20 @@ namespace TelaLogin.Repository
 
        static public object VerificaLogin(LoginUsuario login)
         {
-            string sql = "select * from usuarios where email= @email and senha = @senha";
+          
+            string sql = "select * from usuarios where email= @email";
             using (var conexao = new SQLiteConnection(stringDeConexao))
             {
-              var result = conexao.Query(sql, login ).FirstOrDefault();
-              return result;
+            var  user = conexao.Query<Usuario>(sql, new { login.Email }).FirstOrDefault();
+               // var resp = Auxiliar.ComparaSenhaHash(login.Senha, user.Senha);
+
+                if (user != null && BCrypt.Net.BCrypt.Verify(login.Senha, user.Senha))
+                {
+                    return new { user,Token ="TesteToken",RefreshToken = "TesteRefreshToken" };
+                }
+                return new {messager = "email ou senhas invalidos" };
+
+                
             }
         }
     }

@@ -77,7 +77,7 @@ namespace TelaLogin.Controllers
         public ActionResult Logar([FromBody]LoginUsuario login)
         {
             var result = UsuarioRepository.VerificaLogin(login);
-            return Ok(new { login,token="testeToken",refreshToken="teste RefreshToken" } );
+            return Ok(result);
         }
 
     }
