@@ -7,8 +7,6 @@ using TelaLogin.Repository;
 using TelaLogin.Model;
 using System.Threading.Tasks;
 using System;
-using System.Net.Mail;
-using System.Security.Permissions;
 
 namespace TelaLogin.Controllers
 {
@@ -21,12 +19,19 @@ namespace TelaLogin.Controllers
         {
             return Ok("oi");
         }
-        [HttpGet("getUsuarios")]
+
+        [HttpGet("Listar")]
         public async Task<ActionResult> ListarUsuario()
         {
             var resp = await UsuarioRepository.listarUsuarios();
             return Ok(resp);
+        }
 
+        [HttpGet("Buscar/{id}")]
+        public ActionResult BuscarUsuario(int id)
+        {
+            var resp = UsuarioRepository.BuscarUsuario(id);
+            return Ok(resp);
         }
 
         [HttpPost("cadastrar")]
@@ -49,6 +54,7 @@ namespace TelaLogin.Controllers
             }
 
         }
+
         [HttpPut("alterar")]
         public ActionResult Alterar([FromBody] Usuario usuario)
         {
@@ -61,7 +67,7 @@ namespace TelaLogin.Controllers
 
         }
 
-        [HttpDelete("excluirUsuario/{id}")]
+        [HttpDelete("excluir/{id}")]
         public ActionResult Excluir(int id)
         {
             int resp = (int)UsuarioRepository.ExcluirUsuario(id);
