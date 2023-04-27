@@ -23,8 +23,17 @@ namespace TelaLogin.Controllers
         [HttpGet("Listar")]
         public async Task<ActionResult> ListarUsuario()
         {
-            var resp = await UsuarioRepository.listarUsuarios();
-            return Ok(resp);
+            try
+            {
+                var resp = await UsuarioRepository.listarUsuarios();
+                return Ok(resp);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+           
         }
 
         [HttpGet("Buscar/{id}")]

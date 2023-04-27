@@ -12,9 +12,10 @@ namespace TelaLogin.Repository
 {
     public class UsuarioRepository
     {
-        static private string stringDeConexao = "Data Source=C:\\Users\\Micro\\Desktop\\Login\\TelaLogin\\Banco\\bancoLogin.db";
-        static public async Task<List<Usuario>> listarUsuarios()
+        static private string stringDeConexao = "Data Source=C:\\Users\\Micro\\Documents\\GitHub\\TelaLogin\\Banco\\bancoLogin.db";
+        static public async Task<object> listarUsuarios()
         {
+
             using (var conexao = new SQLiteConnection(stringDeConexao))
             {
                 string sql = "SELECT * FROM usuarios";
@@ -30,14 +31,21 @@ namespace TelaLogin.Repository
             using (var conexao = new SQLiteConnection(stringDeConexao))
             {
                 var usuario = conexao.QueryFirstOrDefault<Usuario>(sql, new { id });
+                //objeto anonimo substituindo DTO
+                var user = new
+                {                                
+                    id = usuario.Id,
+                    nome = usuario.Nome,
+                    email = usuario.Email,                  
+                };
 
-                if (usuario!=null)
+                if (usuario != null)
                 {
-                    return usuario;
+                    return user;
                 }
                 return new { messager = "Usuario não encontrado" };
             }
-            
+
         }
         static public int salvarUsuario(Usuario usuario)
         {
@@ -84,7 +92,7 @@ namespace TelaLogin.Repository
             using (var conexao = new SQLiteConnection(stringDeConexao))
             {
                 var user = conexao.Query<Usuario>(sql, new { login.Email }).FirstOrDefault();
-               
+
 
                 if (user != null && BCrypt.Net.BCrypt.Verify(login.Senha, user.Senha))
                 {
