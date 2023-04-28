@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,29 +31,26 @@ namespace TelaLogin.Repository
             string sql = "select * from usuarios where id = @id";
             using (var conexao = new SQLiteConnection(stringDeConexao))
             {
-                var usuario = conexao.QueryFirstOrDefault<Usuario>(sql, new { id });
-                //objeto anonimo substituindo DTO
-                var user = new
-                {                                
-                    id = usuario.Id,
-                    nome = usuario.Nome,
-                    email = usuario.Email,                  
-                };
-
+                var usuario = conexao.QueryFirstOrDefault<Usuario>(sql, new { id });                          
                 if (usuario != null)
                 {
+                    //objeto anonimo substituindo DTO
+                    var user = new
+                    {
+                        id = usuario.Id,
+                        nome = usuario.Nome,
+                        email = usuario.Email,
+                    };
                     return user;
                 }
-                return new { messager = "Usuario não encontrado" };
+                return usuario;
             }
 
         }
         static public int salvarUsuario(Usuario usuario)
         {
-
+           
             usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha);
-
-
             using (var conexao = new SQLiteConnection(stringDeConexao))
             {
                 string sql = "insert into usuarios (nome, email, senha)values(@nome, @email, @senha)";
@@ -61,7 +59,6 @@ namespace TelaLogin.Repository
             }
 
         }
-
         public static object ExcluirUsuario(int id)
         {
             using (var conexao = new SQLiteConnection(stringDeConexao))
@@ -80,7 +77,6 @@ namespace TelaLogin.Repository
                 string sql = "UPDATE usuarios SET nome=@nome,email=@email,senha=@senha WHERE id=@id";
                 int linhasAfetadas = conexao.Execute(sql, usuario);
                 return linhasAfetadas;
-
             }
 
         }
@@ -98,8 +94,21 @@ namespace TelaLogin.Repository
                 {
                     return new { user, Token = "TesteToken", RefreshToken = "TesteRefreshToken" };
                 }
-                return new { messager = "email ou senhas invalidos" };
+                return null;
 
+            }
+        }
+        static public bool VerificaDuplicidadeEmail(string email)
+        {
+            string sql = "SELECT * FROM usuarios WHERE email = @email";
+            using(var conexao = new SQLiteConnection(stringDeConexao))
+            {
+                var resp = conexao.Query(sql, new { email }).FirstOrDefault();  
+                if(resp!=null)
+                {
+                    return true;
+                }
+                return false;
             }
         }
 

@@ -1,15 +1,13 @@
 ﻿using FluentValidation;
+using System.Security.Cryptography;
 using TelaLogin.Model;
 
-
 namespace TelaLogin.Validation
-{    
-
-    public class UsuarioValidator : AbstractValidator<Usuario>
+{
+    public class UsuarioCreateValidator:AbstractValidator<Usuario>
     {
-        public UsuarioValidator()
+        public UsuarioCreateValidator()
         {
-           
             RuleFor(user => user.Nome.Trim())
                .NotEmpty()
                .WithMessage("O Campo Nome é obrigatorio")
@@ -24,23 +22,7 @@ namespace TelaLogin.Validation
             RuleFor(user => user.Senha.Trim())
                .NotEmpty().NotNull().MinimumLength(3).MaximumLength(100)
                .WithMessage("Senha precisa de ter de 3 a 100 caracteres");
+
         }
-
     }
-    public class LoginUsuarioValidator : AbstractValidator<LoginUsuario>
-    {
-        public LoginUsuarioValidator()
-        {
-            RuleFor(user => user.Email)
-               .NotEmpty()              
-               .EmailAddress();              
-            RuleFor(user => user.Senha)
-                .NotEmpty()
-                .NotNull()
-                .MinimumLength(3)
-                .MaximumLength(100);     
-        }
-
-    }
-
 }
