@@ -7,6 +7,7 @@ using TelaLogin.Repository;
 using TelaLogin.Model;
 using System.Threading.Tasks;
 using System;
+using TelaLogin.Validation;
 
 namespace TelaLogin.Controllers
 {
@@ -46,6 +47,12 @@ namespace TelaLogin.Controllers
         [HttpPost("cadastrar")]
         public ActionResult Salvar([FromBody] Usuario usuario)
         {
+            var validator = new UsuarioValidator();
+            var result = validator.Validate(usuario);
+            if (result.IsValid==false)
+            {
+                return BadRequest(new { Messager = result.Errors.First().ErrorMessage } );
+            }
             try
             {
                 var resp = UsuarioRepository.salvarUsuario(usuario);
@@ -91,8 +98,14 @@ namespace TelaLogin.Controllers
         [HttpPost("logar")]
         public ActionResult Logar([FromBody]LoginUsuario login)
         {
-            var result = UsuarioRepository.VerificaLogin(login);
-            return Ok(result);
+            var validator = new LoginUsuarioValidator();
+            var result = validator.Validate(login);
+            if (result.IsValid == false)
+            {
+                return BadRequest(new { Messager = result.Errors[0].ErrorMessage });
+            }
+            var resp = UsuarioRepository.VerificaLogin(login);
+            return Ok(resp);
         }
 
     }

@@ -1,4 +1,6 @@
 using System;
+using System.Globalization;
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +22,8 @@ namespace TelaLogin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            // ValidatorOptions.Global.LanguageManager.Enabled = true;
+           // ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("pt");// muda ligua padrao flutvalidator
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
