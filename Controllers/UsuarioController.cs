@@ -34,7 +34,6 @@ namespace TelaLogin.Controllers
 
                 return BadRequest(ex.Message);
             }
-
         }
 
         [HttpGet("Buscar/{id}")]
@@ -54,13 +53,12 @@ namespace TelaLogin.Controllers
 
                 return BadRequest(ex.Message);
             }
-
-
         }
 
         [HttpPost("cadastrar")]
         public ActionResult Salvar([FromBody] Usuario usuario)
         {
+            Console.WriteLine(usuario.Id); 
             var validator = new UsuarioCreateValidator();
             var result = validator.Validate(usuario);
             if (result.IsValid == false)
@@ -71,7 +69,7 @@ namespace TelaLogin.Controllers
             {
                 if (UsuarioRepository.VerificaDuplicidadeEmail(usuario.Email))
                 {
-                    return Ok(new { Message = "Não foi possivel pois email já cadastrado" });
+                    return BadRequest(new { Message = "Este email já cadastrado!" });
                 }
 
                 var resp = UsuarioRepository.salvarUsuario(usuario);
@@ -86,14 +84,22 @@ namespace TelaLogin.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
         }
 
         [HttpPut("alterar")]
         public ActionResult Alterar([FromBody] Usuario usuario)
-        {
+        {         
             try
             {
+               var comparaUsuario = UsuarioRepository.BuscarUsuario(usuario.Id);
+                if(comparaUsuario != null && comparaUsuario.Email != usuario.Email)
+                {
+                    if (UsuarioRepository.VerificaDuplicidadeEmail(usuario.Email))
+                    {
+                        return BadRequest(new { Message = "Este email já cadastrado!" });
+                    }
+                }
+               
                 int resp = UsuarioRepository.AlterarUsuario(usuario);
                 if (resp > 0)
                 {
@@ -105,7 +111,6 @@ namespace TelaLogin.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
         }
 
         [HttpDelete("excluir/{id}")]
@@ -124,7 +129,6 @@ namespace TelaLogin.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
         }
 
         [HttpPost("logar")]

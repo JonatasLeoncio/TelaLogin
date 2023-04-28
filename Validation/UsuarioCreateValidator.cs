@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
+using System;
 using System.Security.Cryptography;
 using TelaLogin.Model;
+using TelaLogin.Repository;
 
 namespace TelaLogin.Validation
 {
@@ -8,6 +10,7 @@ namespace TelaLogin.Validation
     {
         public UsuarioCreateValidator()
         {
+          Usuario compara = new Usuario();
             RuleFor(user => user.Nome.Trim())
                .NotEmpty()
                .WithMessage("O Campo Nome é obrigatorio")
@@ -23,6 +26,16 @@ namespace TelaLogin.Validation
                .NotEmpty().NotNull().MinimumLength(3).MaximumLength(100)
                .WithMessage("Senha precisa de ter de 3 a 100 caracteres");
 
+            /*RuleFor(user => user.Email).Must(VerificaDuplicidade)
+                .WithMessage("Este email já esta cadastrado!");*/
         }
+        /*private bool VerificaDuplicidade(string email)
+        {
+            if (UsuarioRepository.VerificaDuplicidadeEmail(email))
+            {
+                return !true;
+            }
+            return !false;
+        }*/
     }
 }

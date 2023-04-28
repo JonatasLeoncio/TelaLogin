@@ -26,13 +26,13 @@ namespace TelaLogin.Repository
             }
 
         }
-        public static object BuscarUsuario(int id)
+        public static Usuario BuscarUsuario(int id)
         {
             string sql = "select * from usuarios where id = @id";
             using (var conexao = new SQLiteConnection(stringDeConexao))
             {
-                var usuario = conexao.QueryFirstOrDefault<Usuario>(sql, new { id });                          
-                if (usuario != null)
+                var usuario = conexao.QueryFirstOrDefault<Usuario>(sql, new { id });
+                /*if (usuario != null)
                 {
                     //objeto anonimo substituindo DTO
                     var user = new
@@ -42,7 +42,7 @@ namespace TelaLogin.Repository
                         email = usuario.Email,
                     };
                     return user;
-                }
+                }*/
                 return usuario;
             }
 
@@ -69,7 +69,6 @@ namespace TelaLogin.Repository
                 return linhasAfetadas;
             }
         }
-
         public static int AlterarUsuario(Usuario usuario)
         {
             using (var conexao = new SQLiteConnection(stringDeConexao))
@@ -80,7 +79,6 @@ namespace TelaLogin.Repository
             }
 
         }
-
         static public object VerificaLogin(LoginUsuario login)
         {
 
