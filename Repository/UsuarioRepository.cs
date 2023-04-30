@@ -14,7 +14,7 @@ namespace TelaLogin.Repository
     public class UsuarioRepository
     {
         static private string stringDeConexao = "Data Source=C:\\Users\\Micro\\Documents\\GitHub\\TelaLogin\\Banco\\bancoLogin.db";
-        static public async Task<object> listarUsuarios()
+        static public async Task<List<Usuario>> listarUsuarios()
         {
 
             using (var conexao = new SQLiteConnection(stringDeConexao))

@@ -8,6 +8,8 @@ using TelaLogin.Model;
 using System.Threading.Tasks;
 using System;
 using TelaLogin.Validation;
+using AutoMapper;
+using TelaLogin.DTO;
 
 namespace TelaLogin.Controllers
 {
@@ -15,6 +17,12 @@ namespace TelaLogin.Controllers
     [Route("[controller]")]
     public class UsuarioController : ControllerBase
     {
+        private readonly IMapper _mapper;
+        public UsuarioController(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
+
         [HttpGet("Ola")]
         public ActionResult Ola()
         {
@@ -27,7 +35,8 @@ namespace TelaLogin.Controllers
             try
             {
                 var resp = await UsuarioRepository.listarUsuarios();
-                return Ok(resp);
+                var listaUsuarioResponse = _mapper.Map<List<UsuarioResponse>>(resp);
+                return Ok(listaUsuarioResponse);
             }
             catch (Exception ex)
             {
@@ -42,11 +51,8 @@ namespace TelaLogin.Controllers
             try
             {
                 var resp = UsuarioRepository.BuscarUsuario(id);
-                if (resp != null)
-                {
-                    return Ok(resp);
-                }
-                return BadRequest(new { Message = "Usuario não encontrado" });
+                var usuarioResponse = _mapper.Map<UsuarioResponse>(resp);
+                return resp!= null ? Ok(usuarioResponse) : BadRequest(new { Message = "Usuario não encontrado" });                
             }
             catch (Exception ex)
             {
@@ -56,9 +62,9 @@ namespace TelaLogin.Controllers
         }
 
         [HttpPost("cadastrar")]
-        public ActionResult Salvar([FromBody] Usuario usuario)
+        public ActionResult Salvar([FromBody] UsuarioRequest usuarioRequest)
         {
-            Console.WriteLine(usuario.Id); 
+            var usuario = _mapper.Map<Usuario>(usuarioRequest);
             var validator = new UsuarioCreateValidator();
             var result = validator.Validate(usuario);
             if (result.IsValid == false)
