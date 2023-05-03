@@ -10,6 +10,7 @@ using System;
 using TelaLogin.Validation;
 using AutoMapper;
 using TelaLogin.DTO;
+using FluentValidation;
 
 namespace TelaLogin.Controllers
 {
@@ -18,9 +19,13 @@ namespace TelaLogin.Controllers
     public class UsuarioController : ControllerBase
     {
         private readonly IMapper _mapper;
-        public UsuarioController(IMapper mapper)
+        private readonly IValidator<Usuario> _validatorUsuario;
+        private readonly IValidator<LoginUsuario> _validatorLogin;   
+        public UsuarioController(IMapper mapper, IValidator<Usuario> validatorUsuario, IValidator<LoginUsuario> validatorLogin)
         {
             _mapper = mapper;
+            _validatorUsuario = validatorUsuario;
+            _validatorLogin = validatorLogin;
         }
 
         [HttpGet("Ola")]
@@ -35,7 +40,7 @@ namespace TelaLogin.Controllers
             try
             {
                 var resp = await UsuarioRepository.listarUsuarios();
-                var listaUsuarioResponse = _mapper.Map<List<UsuarioResponse>>(resp);
+                var listaUsuarioResponse = _mapper.Map<List<Usuario>>(resp);
                 return Ok(listaUsuarioResponse);
             }
             catch (Exception ex)
@@ -65,8 +70,8 @@ namespace TelaLogin.Controllers
         public ActionResult Salvar([FromBody] UsuarioRequest usuarioRequest)
         {
             var usuario = _mapper.Map<Usuario>(usuarioRequest);
-            var validator = new UsuarioCreateValidator();
-            var result = validator.Validate(usuario);
+          // var validator = new UsuarioCreateValidator();
+            var result = _validatorUsuario.Validate(usuario);
             if (result.IsValid == false)
             {
                 return BadRequest(new { Messager = result.Errors.First().ErrorMessage });
@@ -140,8 +145,8 @@ namespace TelaLogin.Controllers
         [HttpPost("logar")]
         public ActionResult Logar([FromBody] LoginUsuario login)
         {
-            var validator = new UsuarioLoginValidator();
-            var result = validator.Validate(login);
+            //var validator = new UsuarioLoginValidator();
+            var result = _validatorLogin.Validate(login);
             if (result.IsValid == false)
             {
                 return BadRequest(new { Messager = result.Errors[0].ErrorMessage });

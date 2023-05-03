@@ -1,13 +1,17 @@
 using System;
 using System.Globalization;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using TelaLogin.MapingDTO;
+using TelaLogin.Model;
+using TelaLogin.Validation;
 
 namespace TelaLogin
 {
@@ -24,11 +28,17 @@ namespace TelaLogin
         public void ConfigureServices(IServiceCollection services)
         {
             // ValidatorOptions.Global.LanguageManager.Enabled = true;/desabilita aligua local edetectada
-           // ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("pt");// muda ligua padrao flutvalidator
-            services.AddControllers();
-            //--
-            services.AddAutoMapper(typeof(MapingEntitiesDto));
+            // ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("pt");// muda ligua padrao flutvalidator
+            /*services.AddControllers()
+                .AddFluentValidation(x=>x.RegisterValidatorsFromAssemblyContaining<Startup>());*/
+            services.AddControllers().AddFluentValidation();
+            services.AddTransient<IValidator<Usuario>, UsuarioCreateValidator>();
+            services.AddTransient<IValidator<LoginUsuario>, UsuarioLoginValidator>();
             
+            services.AddAutoMapper(typeof(MapingEntitiesDto));
+           
+            
+
             //--
             services.AddSwaggerGen(c =>
             {

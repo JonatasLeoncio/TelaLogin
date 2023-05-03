@@ -13,7 +13,7 @@ namespace TelaLogin.Repository
 {
     public class UsuarioRepository
     {
-        static private string stringDeConexao = "Data Source=C:\\Users\\Micro\\Documents\\GitHub\\TelaLogin\\Banco\\bancoLogin.db";
+        static private string stringDeConexao = "Data Source=C:\\Users\\Micro\\Documents\\MeusProjetos\\TelaLogin\\Banco\\bancoLogin.db";
         static public async Task<List<Usuario>> listarUsuarios()
         {
 
