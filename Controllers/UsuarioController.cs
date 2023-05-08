@@ -1,16 +1,13 @@
 ﻿//using Dapper;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-//using System.Data.SQLite;
 using System.Linq;
-using TelaLogin.Repository;
 using TelaLogin.Model;
-using System.Threading.Tasks;
 using System;
-using TelaLogin.Validation;
 using AutoMapper;
 using TelaLogin.DTO;
 using FluentValidation;
+using TelaLogin.Interfaces;
+using TelaLogin.ExceptionResponse;
 
 namespace TelaLogin.Controllers
 {
@@ -19,13 +16,15 @@ namespace TelaLogin.Controllers
     public class UsuarioController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IValidator<Usuario> _validatorUsuario;
-        private readonly IValidator<LoginUsuario> _validatorLogin;   
-        public UsuarioController(IMapper mapper, IValidator<Usuario> validatorUsuario, IValidator<LoginUsuario> validatorLogin)
+        private readonly IValidator<UsuarioRequest> _validatorUsuario;
+        private readonly IValidator<LoginUsuario> _validatorLogin;
+        private readonly IUsuarioService _usuarioService;
+        public UsuarioController(IMapper mapper, IValidator<UsuarioRequest> validatorUsuario, IValidator<LoginUsuario> validatorLogin, IUsuarioService usuarioService)
         {
             _mapper = mapper;
             _validatorUsuario = validatorUsuario;
             _validatorLogin = validatorLogin;
+            _usuarioService = usuarioService;
         }
 
         [HttpGet("Ola")]
@@ -35,114 +34,105 @@ namespace TelaLogin.Controllers
         }
 
         [HttpGet("Listar")]
-        public async Task<ActionResult> ListarUsuario()
+        public ActionResult ListarUsuario()
         {
             try
             {
-                var resp = await UsuarioRepository.listarUsuarios();
-                var listaUsuarioResponse = _mapper.Map<List<Usuario>>(resp);
-                return Ok(listaUsuarioResponse);
+                var resp = _usuarioService.listarUsuarios();
+                return Ok(resp);
             }
             catch (Exception ex)
             {
-
                 return BadRequest(ex.Message);
             }
+
         }
 
         [HttpGet("Buscar/{id}")]
-        public ActionResult BuscarUsuario(int id)
+        public ActionResult<UsuarioResponse> BuscarUsuario(int id)
         {
             try
             {
-                var resp = UsuarioRepository.BuscarUsuario(id);
-                var usuarioResponse = _mapper.Map<UsuarioResponse>(resp);
-                return resp!= null ? Ok(usuarioResponse) : BadRequest(new { Message = "Usuario não encontrado" });                
+                var resp = _usuarioService.BuscarUsuario(id);
+                return resp;
+            }
+            catch (NaoEncontradoException ex)
+            {
+                return StatusCode(ex.StatusCode, new { ex.Message });
             }
             catch (Exception ex)
             {
-
-                return BadRequest(ex.Message);
+                /*if (ex is NaoEncontradoException)
+                {
+                    return StatusCode(404, new { ex.Message });
+                }*/
+                return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpPost("cadastrar")]
         public ActionResult Salvar([FromBody] UsuarioRequest usuarioRequest)
         {
-            var usuario = _mapper.Map<Usuario>(usuarioRequest);
-          // var validator = new UsuarioCreateValidator();
-            var result = _validatorUsuario.Validate(usuario);
+           
+            var result = _validatorUsuario.Validate(usuarioRequest);
             if (result.IsValid == false)
-            {
                 return BadRequest(new { Messager = result.Errors.First().ErrorMessage });
-            }
+           
             try
             {
-                if (UsuarioRepository.VerificaDuplicidadeEmail(usuario.Email))
-                {
-                    return BadRequest(new { Message = "Este email já cadastrado!" });
-                }
-
-                var resp = UsuarioRepository.salvarUsuario(usuario);
-                if (resp > 0)
-                {
-                    return Ok(new { Message = "salvo com sucesso" });
-                }
-                return StatusCode(200,new { Message = "não foi salvo" });
-
+                
+                var resp = _usuarioService.SalvarUsuario(usuarioRequest);
+                
+                return Ok(new { Message = "salvo com sucesso" });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
-        [HttpPut("alterar")]
-        public ActionResult Alterar([FromBody] Usuario usuario)
-        {         
-            try
-            {
-               var comparaUsuario = UsuarioRepository.BuscarUsuario(usuario.Id);
-                if(comparaUsuario != null && comparaUsuario.Email != usuario.Email)
-                {
-                    if (UsuarioRepository.VerificaDuplicidadeEmail(usuario.Email))
-                    {
-                        return BadRequest(new { Message = "Este email já cadastrado!" });
-                    }
-                }
-               
-                int resp = UsuarioRepository.AlterarUsuario(usuario);
-                if (resp > 0)
-                {
-                    return Ok(new { message = "alterado com sucesso" });
-                }
-                return Ok(new { message = "não foi alterado" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        /* [HttpPut("alterar")]
+         public ActionResult Alterar([FromBody] Usuario usuario)
+         {         
+             try
+             {
+                var comparaUsuario = _usuarioService.BuscarUsuario(usuario.Id);
+                 if(comparaUsuario != null && comparaUsuario.Email != usuario.Email)
+                 {
+                     if (_usuarioService.VerificaDuplicidadeEmail(usuario.Email))
+                     {
+                         return BadRequest(new { Message = "Este email já cadastrado!" });
+                     }
+                 }
+
+                 int resp = _usuarioService.AlterarUsuario(usuario);
+                 if (resp > 0)
+                 {
+                     return Ok(new { message = "alterado com sucesso" });
+                 }
+                 return Ok(new { message = "não foi alterado" });
+             }
+             catch (Exception ex)
+             {
+                 return BadRequest(ex.Message);
+             }
+         }*/
 
         [HttpDelete("excluir/{id}")]
         public ActionResult Excluir(int id)
         {
             try
             {
-                int resp = (int)UsuarioRepository.ExcluirUsuario(id);
-                if (resp > 0)
-                {
-                    return Ok(new {Message= "Excluido com sucesso" });
-                }
-                return Ok(new { Message = "não foi possivel fazer exclusão" });
+                int resp = _usuarioService.ExcluirUsuario(id);
+                return Ok(new { Message = "Excluido com sucesso" });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
-        }
 
-        [HttpPost("logar")]
+        }
+        /*[HttpPost("logar")]
         public ActionResult Logar([FromBody] LoginUsuario login)
         {
             //var validator = new UsuarioLoginValidator();
@@ -152,21 +142,21 @@ namespace TelaLogin.Controllers
                 return BadRequest(new { Messager = result.Errors[0].ErrorMessage });
             }
             try
-            {                
-                var resp = UsuarioRepository.VerificaLogin(login);
-                if(resp!=null)
-                {
-                    return Ok(resp);
+            {
+                var resp = _usuarioRepository.VerificaLogin(login);
+
+                if (resp != null)
+                {                                    
+
+                    return Ok(new { resp,token="tokenTeste",refreshToken="refreshTokenTeste" });
                 }
-                return BadRequest(new {message="email ou senha invalidos"});
-                
+                return BadRequest(new { message = "email ou senha invalidos" });
+
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
-            }
-
-        }
+            }*/
 
     }
 }

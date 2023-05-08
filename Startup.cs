@@ -9,8 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using TelaLogin.DTO;
+using TelaLogin.Interfaces;
 using TelaLogin.MapingDTO;
 using TelaLogin.Model;
+using TelaLogin.Repository;
+using TelaLogin.Services;
 using TelaLogin.Validation;
 
 namespace TelaLogin
@@ -32,12 +36,13 @@ namespace TelaLogin
             /*services.AddControllers()
                 .AddFluentValidation(x=>x.RegisterValidatorsFromAssemblyContaining<Startup>());*/
             services.AddControllers().AddFluentValidation();
-            services.AddTransient<IValidator<Usuario>, UsuarioCreateValidator>();
+            services.AddTransient<IValidator<UsuarioRequest>, UsuarioCreateValidator>();
             services.AddTransient<IValidator<LoginUsuario>, UsuarioLoginValidator>();
             
             services.AddAutoMapper(typeof(MapingEntitiesDto));
-           
-            
+
+            services.AddSingleton<IUsuarioRepositorio, UsuarioRepository>();
+            services.AddSingleton<IUsuarioService, UsuarioService>();
 
             //--
             services.AddSwaggerGen(c =>

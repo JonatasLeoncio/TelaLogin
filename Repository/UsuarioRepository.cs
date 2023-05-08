@@ -1,65 +1,70 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Data.SQLite;
 using System.Linq;
-using System.Threading.Tasks;
+using TelaLogin.Interfaces;
 using TelaLogin.Model;
 //using static BCrypt.Net.BCrypt;
 
 
 namespace TelaLogin.Repository
 {
-    public class UsuarioRepository
+    public class UsuarioRepository : IUsuarioRepositorio
     {
-        static private string stringDeConexao = "Data Source=C:\\Users\\Micro\\Documents\\MeusProjetos\\TelaLogin\\Banco\\bancoLogin.db";
-        static public async Task<List<Usuario>> listarUsuarios()
+        private string stringDeConexao = "Data Source=C:\\Users\\Micro\\Documents\\MeusProjetos\\TelaLogin\\Banco\\bancoLogin.db";
+        public List<Usuario> listarUsuarios()
         {
 
             using (var conexao = new SQLiteConnection(stringDeConexao))
             {
                 string sql = "SELECT * FROM usuarios";
-                var usuario = await conexao.QueryAsync<Usuario>(sql);
+                var usuario = conexao.Query<Usuario>(sql);
 
                 return usuario.ToList();
             }
 
         }
-        public static Usuario BuscarUsuario(int id)
+        public Usuario BuscarUsuario(int id)
         {
-            string sql = "select * from usuarios where id = @id";
-            using (var conexao = new SQLiteConnection(stringDeConexao))
+            try
             {
-                var usuario = conexao.QueryFirstOrDefault<Usuario>(sql, new { id });
-                /*if (usuario != null)
+                string sql = "select * from usuarios where id = @id";
+                using (var conexao = new SQLiteConnection(stringDeConexao))
                 {
-                    //objeto anonimo substituindo DTO
-                    var user = new
-                    {
-                        id = usuario.Id,
-                        nome = usuario.Nome,
-                        email = usuario.Email,
-                    };
-                    return user;
-                }*/
-                return usuario;
-            }
+                    var usuario = conexao.QueryFirstOrDefault<Usuario>(sql, new { id });
+                    return usuario;
+                }
 
-        }
-        static public int salvarUsuario(Usuario usuario)
-        {
-           
-            usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha);
-            using (var conexao = new SQLiteConnection(stringDeConexao))
+            }
+            catch (Exception ex)
             {
-                string sql = "insert into usuarios (nome, email, senha)values(@nome, @email, @senha)";
-                int linhasAfetadas = conexao.Execute(sql, usuario);
-                return linhasAfetadas;
+
+                throw new(ex.Message + "Erro na Conexão");
             }
 
         }
-        public static object ExcluirUsuario(int id)
+        public int SalvarUsuario(Usuario usuario)
+        {
+            try
+            {
+                usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha, 10);
+                using (var conexao = new SQLiteConnection(stringDeConexao))
+                {
+                    string sql = "insert into usuarios (nome, email, senha)values(@nome, @email, @senha)";
+                    int linhasAfetadas = conexao.Execute(sql, usuario);
+                    return linhasAfetadas;
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new(ex.Message + "Erro na Conexão");
+            }
+
+        }
+        public int ExcluirUsuario(int id)
         {
             using (var conexao = new SQLiteConnection(stringDeConexao))
             {
@@ -69,7 +74,7 @@ namespace TelaLogin.Repository
                 return linhasAfetadas;
             }
         }
-        public static int AlterarUsuario(Usuario usuario)
+        public int AlterarUsuario(Usuario usuario)
         {
             using (var conexao = new SQLiteConnection(stringDeConexao))
             {
@@ -79,36 +84,48 @@ namespace TelaLogin.Repository
             }
 
         }
-        static public object VerificaLogin(LoginUsuario login)
-        {
-
-            string sql = "select * from usuarios where email= @email";
-            using (var conexao = new SQLiteConnection(stringDeConexao))
-            {
-                var user = conexao.Query<Usuario>(sql, new { login.Email }).FirstOrDefault();
-
-
-                if (user != null && BCrypt.Net.BCrypt.Verify(login.Senha, user.Senha))
-                {
-                    return new { user, Token = "TesteToken", RefreshToken = "TesteRefreshToken" };
-                }
-                return null;
-
-            }
-        }
-        static public bool VerificaDuplicidadeEmail(string email)
+        public bool VerificaDuplicidadeEmail(string email)
         {
             string sql = "SELECT * FROM usuarios WHERE email = @email";
-            using(var conexao = new SQLiteConnection(stringDeConexao))
+            using (var conexao = new SQLiteConnection(stringDeConexao))
             {
-                var resp = conexao.Query(sql, new { email }).FirstOrDefault();  
-                if(resp!=null)
+                var resp = conexao.Query(sql, new { email }).FirstOrDefault();
+                if (resp != null)
                 {
                     return true;
                 }
                 return false;
             }
         }
+        public Usuario VerificaLogin(LoginUsuario login)
+        {
+            string sql = "select * from usuarios where email= @email";
+            using (var conexao = new SQLiteConnection(stringDeConexao))
+            {
+                var user = conexao.Query<Usuario>(sql, new { login.Email }).FirstOrDefault();
 
+                if (user != null && BCrypt.Net.BCrypt.Verify(login.Senha, user.Senha))
+                {
+                    return user;
+                }
+                return null;
+
+            }
+        }
+
+        public Usuario BuscarPorEmail(string email)
+        {
+           
+            string sql = "SELECT * FROM usuarios WHERE email = @email";
+            using (var conexao = new SQLiteConnection(stringDeConexao))
+            {
+                Console.WriteLine("entrou1");
+                Usuario resp = conexao.Query(sql, new { email }).First();
+                
+                Console.WriteLine("entrou2",resp.Nome);
+
+                return resp;
+            }
+        }
     }
 }
