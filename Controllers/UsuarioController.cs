@@ -8,6 +8,7 @@ using TelaLogin.DTO;
 using FluentValidation;
 using TelaLogin.Interfaces;
 using TelaLogin.ExceptionResponse;
+using TelaLogin.ExceptionResponse.AuxiliarMetodoEntitieExeption;
 
 namespace TelaLogin.Controllers
 {
@@ -59,19 +60,20 @@ namespace TelaLogin.Controllers
                 return resp;
             }
             /*catch (NaoEncontradoException ex)
-            {
+              {
                 return StatusCode(ex.StatusCode, new { ex.Message });
-            }*/
+              }*/
             catch (Exception ex)
             {
-                if (ex is NaoEncontradoException)
+                var exPersonal = RespostaDeExecao.VerificaException(ex);
+                if (exPersonal != null)
                 {
-                    return StatusCode(404, new { ex.Message });
+                    return StatusCode(exPersonal.Status, new { exPersonal.Message });
                 }
                 return BadRequest(new { message = ex.Message });
             }
         }
-
+       
         [HttpPost("cadastrar")]
         public ActionResult Salvar([FromBody] UsuarioRequest usuarioRequest)
         {

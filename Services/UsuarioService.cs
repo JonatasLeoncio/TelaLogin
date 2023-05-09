@@ -35,7 +35,8 @@ namespace TelaLogin.Services
             {
                 return usuarioResponse;
             }
-            throw new NaoEncontradoException($"Usuário com id {id} não foi encontrado", StatusCodes.Status404NotFound);
+            //throw new NaoEncontradoException($"Usuário com id {id} não foi encontrado", StatusCodes.Status404NotFound);
+            throw new NaoEncontradoException();
 
         }
         public int SalvarUsuario(UsuarioRequest usuario)

@@ -40,7 +40,7 @@ namespace TelaLogin.Repository
             catch (Exception ex)
             {
 
-                throw new(ex.Message + "Erro na Conexão");
+                throw new(ex.Message + " Erro na Conexão");
             }
 
         }
@@ -118,10 +118,8 @@ namespace TelaLogin.Repository
            
             string sql = "select * from usuarios where email = @email";
             using (var conexao = new SQLiteConnection(stringDeConexao))
-            {
-                Console.WriteLine("entrou1");
-                var usuario = conexao.QueryFirstOrDefault<Usuario>(sql, new { email });
-                Console.WriteLine("entrou2");
+            {               
+                var usuario = conexao.QueryFirstOrDefault<Usuario>(sql, new { email });               
                 return usuario;
             }
         }
