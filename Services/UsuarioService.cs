@@ -36,22 +36,40 @@ namespace TelaLogin.Services
                 return usuarioResponse;
             }
             throw new NaoEncontradoException($"Usuário com id {id} não foi encontrado", StatusCodes.Status404NotFound);
-            
+
         }
         public int SalvarUsuario(UsuarioRequest usuario)
         {
 
-            VerificaDuplicidadeEmail(usuario.Email);
-            
+            if (VerificaDuplicidadeEmail(usuario.Email))
+            {
+                throw new Exception(message: "Email já cadastrado");
+            }
+
+            usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha, 10);
             var resp = _usuarioRepositorio.SalvarUsuario(_mapper.Map<Usuario>(usuario));
-            if(resp>0)
-              return resp;
-            throw new Exception(message : "Não foi possivel Salvar Cadastro");
+            if (resp > 0)
+                return resp;
+            throw new Exception(message: "Não foi possivel Salvar Cadastro");
         }
         public int AlterarUsuario(Usuario usuario)
         {
+            var comparaUsuario = _usuarioRepositorio.BuscarUsuario(usuario.Id);
+            Console.WriteLine(comparaUsuario.Senha);
+            if (comparaUsuario != null && comparaUsuario.Email != usuario.Email)
+            {
+                if (VerificaDuplicidadeEmail(usuario.Email))
+                {
+                    throw new Exception(message: "Email já cadastrado");
+                }
+            }
+            usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha, 10);
             var resp = _usuarioRepositorio.AlterarUsuario(usuario);
-            return resp;
+            if (resp > 0)
+            {
+                return resp;
+            }
+            throw new Exception(message: "Não foi possivel alterar Cadastro.");
         }
         public int ExcluirUsuario(int id)
         {
@@ -62,14 +80,13 @@ namespace TelaLogin.Services
             }
             throw new Exception(message: "Erro ao Excluir.");
         }
-        public bool VerificaDuplicidadeEmail(string email)
+        private bool VerificaDuplicidadeEmail(string email)
         {
-            
-            var resp = _usuarioRepositorio.VerificaDuplicidadeEmail(email);
-            if (resp)
+
+            var resp = _usuarioRepositorio.BuscarPorEmail(email);
+            if (resp != null)
             {
-               
-                throw new Exception(message: "Email já cadastrado");
+                return true;
             }
             return false;
         }

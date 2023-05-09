@@ -15,16 +15,18 @@ namespace TelaLogin.Controllers
     [Route("[controller]")]
     public class UsuarioController : ControllerBase
     {
-        private readonly IMapper _mapper;
+
         private readonly IValidator<UsuarioRequest> _validatorUsuario;
         private readonly IValidator<LoginUsuario> _validatorLogin;
         private readonly IUsuarioService _usuarioService;
-        public UsuarioController(IMapper mapper, IValidator<UsuarioRequest> validatorUsuario, IValidator<LoginUsuario> validatorLogin, IUsuarioService usuarioService)
+        public UsuarioController(
+                IValidator<UsuarioRequest> validatorUsuario,
+                IValidator<LoginUsuario> validatorLogin,
+                IUsuarioService usuarioService)
         {
-            _mapper = mapper;
-            _validatorUsuario = validatorUsuario;
-            _validatorLogin = validatorLogin;
-            _usuarioService = usuarioService;
+                _validatorUsuario = validatorUsuario;
+                _validatorLogin = validatorLogin;
+                _usuarioService = usuarioService;
         }
 
         [HttpGet("Ola")]
@@ -56,16 +58,16 @@ namespace TelaLogin.Controllers
                 var resp = _usuarioService.BuscarUsuario(id);
                 return resp;
             }
-            catch (NaoEncontradoException ex)
+            /*catch (NaoEncontradoException ex)
             {
                 return StatusCode(ex.StatusCode, new { ex.Message });
-            }
+            }*/
             catch (Exception ex)
             {
-                /*if (ex is NaoEncontradoException)
+                if (ex is NaoEncontradoException)
                 {
                     return StatusCode(404, new { ex.Message });
-                }*/
+                }
                 return BadRequest(new { message = ex.Message });
             }
         }
@@ -73,16 +75,13 @@ namespace TelaLogin.Controllers
         [HttpPost("cadastrar")]
         public ActionResult Salvar([FromBody] UsuarioRequest usuarioRequest)
         {
-           
             var result = _validatorUsuario.Validate(usuarioRequest);
             if (result.IsValid == false)
                 return BadRequest(new { Messager = result.Errors.First().ErrorMessage });
-           
+
             try
             {
-                
                 var resp = _usuarioService.SalvarUsuario(usuarioRequest);
-                
                 return Ok(new { Message = "salvo com sucesso" });
             }
             catch (Exception ex)
@@ -91,32 +90,19 @@ namespace TelaLogin.Controllers
             }
         }
 
-        /* [HttpPut("alterar")]
-         public ActionResult Alterar([FromBody] Usuario usuario)
-         {         
-             try
-             {
-                var comparaUsuario = _usuarioService.BuscarUsuario(usuario.Id);
-                 if(comparaUsuario != null && comparaUsuario.Email != usuario.Email)
-                 {
-                     if (_usuarioService.VerificaDuplicidadeEmail(usuario.Email))
-                     {
-                         return BadRequest(new { Message = "Este email já cadastrado!" });
-                     }
-                 }
-
-                 int resp = _usuarioService.AlterarUsuario(usuario);
-                 if (resp > 0)
-                 {
-                     return Ok(new { message = "alterado com sucesso" });
-                 }
-                 return Ok(new { message = "não foi alterado" });
-             }
-             catch (Exception ex)
-             {
-                 return BadRequest(ex.Message);
-             }
-         }*/
+        [HttpPut("alterar")]
+        public ActionResult Alterar([FromBody] Usuario usuario)
+        {
+            try
+            {
+                int resp = _usuarioService.AlterarUsuario(usuario);
+                return Ok(new { message = "alterado com sucesso" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         [HttpDelete("excluir/{id}")]
         public ActionResult Excluir(int id)

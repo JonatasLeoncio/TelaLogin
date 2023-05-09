@@ -12,7 +12,7 @@ namespace TelaLogin.Interfaces
         int ExcluirUsuario(int id);
         int AlterarUsuario(Usuario usuario);
 
-        bool VerificaDuplicidadeEmail(string email);
+        //bool VerificaDuplicidadeEmail(string email);
         Usuario VerificaLogin(LoginUsuario login);
         string GerarToken(Usuario usuario);
         string GerarRefreshToken(Usuario usuario);

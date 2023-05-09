@@ -48,7 +48,7 @@ namespace TelaLogin.Repository
         {
             try
             {
-                usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha, 10);
+                //usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha, 10);
                 using (var conexao = new SQLiteConnection(stringDeConexao))
                 {
                     string sql = "insert into usuarios (nome, email, senha)values(@nome, @email, @senha)";
@@ -116,15 +116,13 @@ namespace TelaLogin.Repository
         public Usuario BuscarPorEmail(string email)
         {
            
-            string sql = "SELECT * FROM usuarios WHERE email = @email";
+            string sql = "select * from usuarios where email = @email";
             using (var conexao = new SQLiteConnection(stringDeConexao))
             {
                 Console.WriteLine("entrou1");
-                Usuario resp = conexao.Query(sql, new { email }).First();
-                
-                Console.WriteLine("entrou2",resp.Nome);
-
-                return resp;
+                var usuario = conexao.QueryFirstOrDefault<Usuario>(sql, new { email });
+                Console.WriteLine("entrou2");
+                return usuario;
             }
         }
     }
