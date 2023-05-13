@@ -12,7 +12,8 @@ namespace TelaLogin.Repository
 {
     public class UsuarioRepository : IUsuarioRepositorio
     {
-        private string stringDeConexao = "Data Source=C:\\Users\\Micro\\Documents\\MeusProjetos\\TelaLogin\\Banco\\bancoLogin.db";
+        
+        string stringDeConexao = Environment.GetEnvironmentVariable("My_Conexao_SQLite");
         public List<Usuario> listarUsuarios()
         {
 

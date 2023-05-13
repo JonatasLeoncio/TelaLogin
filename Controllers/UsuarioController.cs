@@ -112,7 +112,7 @@ namespace TelaLogin.Controllers
         }
 
         [HttpDelete("excluir/{id}")]
-        [Authorize]
+       // [Authorize]
         public ActionResult Excluir(int id)
         {
             try

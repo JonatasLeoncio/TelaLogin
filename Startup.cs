@@ -19,6 +19,7 @@ using TelaLogin.Model;
 using TelaLogin.Repository;
 using TelaLogin.Services;
 using TelaLogin.Validation;
+//using DotNetEnv;
 
 namespace TelaLogin
 {
@@ -34,6 +35,8 @@ namespace TelaLogin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            DotNetEnv.Env.Load();
+
             // ValidatorOptions.Global.LanguageManager.Enabled = true;/desabilita aligua local edetectada
             // ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("pt");// muda ligua padrao flutvalidator
             /*services.AddControllers()
