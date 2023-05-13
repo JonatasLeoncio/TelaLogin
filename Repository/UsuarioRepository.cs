@@ -112,7 +112,6 @@ namespace TelaLogin.Repository
 
             }
         }
-
         public Usuario BuscarPorEmail(string email)
         {
            

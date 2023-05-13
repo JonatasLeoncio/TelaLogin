@@ -3,17 +3,18 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using TelaLogin.Model;
 using System;
-using AutoMapper;
 using TelaLogin.DTO;
 using FluentValidation;
 using TelaLogin.Interfaces;
 using TelaLogin.ExceptionResponse;
 using TelaLogin.ExceptionResponse.AuxiliarMetodoEntitieExeption;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TelaLogin.Controllers
 {
     [Controller]
     [Route("[controller]")]
+    
     public class UsuarioController : ControllerBase
     {
 
@@ -37,6 +38,7 @@ namespace TelaLogin.Controllers
         }
 
         [HttpGet("Listar")]
+        [AllowAnonymous]
         public ActionResult ListarUsuario()
         {
             try
@@ -51,7 +53,9 @@ namespace TelaLogin.Controllers
 
         }
 
+        
         [HttpGet("Buscar/{id}")]
+        [Authorize]
         public ActionResult<UsuarioResponse> BuscarUsuario(int id)
         {
             try
@@ -91,8 +95,9 @@ namespace TelaLogin.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
+        
         [HttpPut("alterar")]
+        [Authorize]
         public ActionResult Alterar([FromBody] Usuario usuario)
         {
             try
@@ -107,6 +112,7 @@ namespace TelaLogin.Controllers
         }
 
         [HttpDelete("excluir/{id}")]
+        [Authorize]
         public ActionResult Excluir(int id)
         {
             try
@@ -120,8 +126,10 @@ namespace TelaLogin.Controllers
             }
 
         }
-        /*[HttpPost("logar")]
-        public ActionResult Logar([FromBody] LoginUsuario login)
+
+        [HttpPost("logar")]
+        [AllowAnonymous]
+        public ActionResult<object> Logar([FromBody] LoginUsuario login)
         {
             //var validator = new UsuarioLoginValidator();
             var result = _validatorLogin.Validate(login);
@@ -131,20 +139,14 @@ namespace TelaLogin.Controllers
             }
             try
             {
-                var resp = _usuarioRepository.VerificaLogin(login);
-
-                if (resp != null)
-                {                                    
-
-                    return Ok(new { resp,token="tokenTeste",refreshToken="refreshTokenTeste" });
-                }
-                return BadRequest(new { message = "email ou senha invalidos" });
+                var resp = _usuarioService.VerificaLogin(login);             
+                return resp;
 
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
-            }*/
-
+                return BadRequest(new { Messager = ex.Message });
+            }
+        }
     }
 }

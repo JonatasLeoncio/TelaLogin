@@ -11,11 +11,10 @@ namespace TelaLogin.ExceptionResponse
         {
             if (message == null|| message == string.Empty)
             {
-            message = "Não Encontrado";
-
+               message = "Recurso não Encontrado";
             }
-            StatusCode = statusCode;
             Message = message;
+            StatusCode = statusCode;
         }
        
     }

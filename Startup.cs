@@ -1,13 +1,16 @@
 using System;
 using System.Globalization;
+using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using TelaLogin.DTO;
 using TelaLogin.Interfaces;
@@ -45,6 +48,27 @@ namespace TelaLogin
             services.AddSingleton<IUsuarioService, UsuarioService>();
 
             //--
+
+            //___________adicinando jwt e beare para token
+            var key = Encoding.ASCII.GetBytes(Settings.Secret);
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+            //___________________________________
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TelaLogin", Version = "v1" });
@@ -64,6 +88,8 @@ namespace TelaLogin
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication(); //acrescentar para autenticar o token
 
             app.UseAuthorization();
 

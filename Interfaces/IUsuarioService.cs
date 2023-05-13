@@ -11,10 +11,11 @@ namespace TelaLogin.Interfaces
         int SalvarUsuario(UsuarioRequest usuario);
         int ExcluirUsuario(int id);
         int AlterarUsuario(Usuario usuario);
+        object VerificaLogin(LoginUsuario login);
 
         //bool VerificaDuplicidadeEmail(string email);
-        Usuario VerificaLogin(LoginUsuario login);
-        string GerarToken(Usuario usuario);
-        string GerarRefreshToken(Usuario usuario);
+        // Usuario VerificaLogin(LoginUsuario login);
+        // string GerarToken(Usuario usuario);
+        //string GerarRefreshToken(Usuario usuario);
     }
 }

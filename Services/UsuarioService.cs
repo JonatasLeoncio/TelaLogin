@@ -83,7 +83,6 @@ namespace TelaLogin.Services
         }
         private bool VerificaDuplicidadeEmail(string email)
         {
-
             var resp = _usuarioRepositorio.BuscarPorEmail(email);
             if (resp != null)
             {
@@ -92,10 +91,22 @@ namespace TelaLogin.Services
             return false;
         }
 
-        public Usuario VerificaLogin(LoginUsuario login)
+        public object VerificaLogin(LoginUsuario login)
         {
-            throw new System.NotImplementedException();
+
+            var resp = _usuarioRepositorio.VerificaLogin(login);
+
+            if (resp != null)
+            {
+                var token = TokenServices.GerarToken(resp);
+
+                var usuarioresponse= _mapper.Map<UsuarioResponse>(resp);
+                return new { usuarioresponse,token, refreshToken = "refreshTokenTeste" };
+            }
+            throw new Exception("email ou senha invalidos");
+            
         }
+
         public string GerarToken(Usuario usuario)
         {
             throw new System.NotImplementedException();
@@ -106,9 +117,6 @@ namespace TelaLogin.Services
             throw new System.NotImplementedException();
         }
 
-
-
-
-
+        
     }
 }
