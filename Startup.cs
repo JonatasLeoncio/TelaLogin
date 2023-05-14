@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -28,6 +29,7 @@ namespace TelaLogin
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+           
         }
 
         public IConfiguration Configuration { get; }
@@ -35,7 +37,15 @@ namespace TelaLogin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            DotNetEnv.Env.Load();
+            DotNetEnv.Env.Load();//caso use o dotenv para variaveis de ambientes
+
+            var configuration = new ConfigurationBuilder()
+               .SetBasePath(Directory.GetCurrentDirectory())
+               .AddJsonFile("appsettings.json")               
+               .Build();
+
+            services.AddSingleton(configuration);
+
 
             // ValidatorOptions.Global.LanguageManager.Enabled = true;/desabilita aligua local edetectada
             // ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("pt");// muda ligua padrao flutvalidator
@@ -50,7 +60,7 @@ namespace TelaLogin
             services.AddSingleton<IUsuarioRepositorio, UsuarioRepository>();
             services.AddSingleton<IUsuarioService, UsuarioService>();
 
-            //--
+           
 
             //___________adicinando jwt e beare para token
             var key = Encoding.ASCII.GetBytes(Settings.Secret);

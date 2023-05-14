@@ -1,7 +1,9 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.IO;
 using System.Linq;
 using TelaLogin.Interfaces;
 using TelaLogin.Model;
@@ -11,13 +13,31 @@ using TelaLogin.Model;
 namespace TelaLogin.Repository
 {
     public class UsuarioRepository : IUsuarioRepositorio
-    {
+    {              
+       
+        private readonly IConfiguration _configuration;
+        public UsuarioRepository(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            connectionString = configuration.GetConnectionString("MYSQLite");
+        }         
+        private  readonly string connectionString;//pelo appsetings
+        private readonly string stringDeConexao = Environment.GetEnvironmentVariable("My_Conexao_SQLite");//pelo dotenv
         
-        string stringDeConexao = Environment.GetEnvironmentVariable("My_Conexao_SQLite");
+
         public List<Usuario> listarUsuarios()
         {
+            /* var builder = new ConfigurationBuilder()
+                 .SetBasePath(Directory.GetCurrentDirectory())
+                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                 .AddEnvironmentVariables().Build();
 
-            using (var conexao = new SQLiteConnection(stringDeConexao))
+             string connectionString = builder.GetConnectionString("TESTE");*/
+
+          // var connectionString = _configuration.GetConnectionString("MYSQLite");//ou dessa forma
+           
+          
+            using (var conexao = new SQLiteConnection(connectionString))
             {
                 string sql = "SELECT * FROM usuarios";
                 var usuario = conexao.Query<Usuario>(sql);
@@ -48,8 +68,7 @@ namespace TelaLogin.Repository
         public int SalvarUsuario(Usuario usuario)
         {
             try
-            {
-                //usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha, 10);
+            {               
                 using (var conexao = new SQLiteConnection(stringDeConexao))
                 {
                     string sql = "insert into usuarios (nome, email, senha)values(@nome, @email, @senha)";
@@ -115,11 +134,11 @@ namespace TelaLogin.Repository
         }
         public Usuario BuscarPorEmail(string email)
         {
-           
+
             string sql = "select * from usuarios where email = @email";
             using (var conexao = new SQLiteConnection(stringDeConexao))
-            {               
-                var usuario = conexao.QueryFirstOrDefault<Usuario>(sql, new { email });               
+            {
+                var usuario = conexao.QueryFirstOrDefault<Usuario>(sql, new { email });
                 return usuario;
             }
         }
