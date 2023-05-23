@@ -97,7 +97,7 @@ namespace TelaLogin.Controllers
         }
         
         [HttpPut("alterar")]
-        [Authorize]
+        //[Authorize]
         public ActionResult Alterar([FromBody] Usuario usuario)
         {
             try
@@ -130,8 +130,7 @@ namespace TelaLogin.Controllers
         [HttpPost("logar")]
         [AllowAnonymous]
         public ActionResult<object> Logar([FromBody] LoginUsuario login)
-        {
-            //var validator = new UsuarioLoginValidator();
+        {            
             var result = _validatorLogin.Validate(login);
             if (result.IsValid == false)
             {

@@ -10,9 +10,10 @@ namespace TelaLogin.Validation
     public class UsuarioCreateValidator:AbstractValidator<UsuarioRequest>
     {
         public UsuarioCreateValidator()
-        {         
+        {
             RuleFor(user => user.Nome)
                .NotEmpty()
+               .NotNull()
                .WithMessage("O Campo {PropertyName} é obrigatorio")
                /* .Length(3, 10)
                 .WithMessage("O nome precisa te de 3 a 100 caracteres")*/

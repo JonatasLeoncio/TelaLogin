@@ -39,7 +39,7 @@ namespace TelaLogin
         {
             DotNetEnv.Env.Load();//caso use o dotenv para variaveis de ambientes
 
-            var configuration = new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder()     //para acessar appsettings por injeção
                .SetBasePath(Directory.GetCurrentDirectory())
                .AddJsonFile("appsettings.json")               
                .Build();
@@ -49,7 +49,7 @@ namespace TelaLogin
 
             // ValidatorOptions.Global.LanguageManager.Enabled = true;/desabilita aligua local edetectada
             // ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("pt");// muda ligua padrao flutvalidator
-            /*services.AddControllers()
+            /*services.AddControllers() // nesse caso não precisa ficar atribuindo classe por classe
                 .AddFluentValidation(x=>x.RegisterValidatorsFromAssemblyContaining<Startup>());*/
             services.AddControllers().AddFluentValidation();
             services.AddTransient<IValidator<UsuarioRequest>, UsuarioCreateValidator>();
