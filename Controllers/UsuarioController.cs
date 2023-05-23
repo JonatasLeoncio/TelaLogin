@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace TelaLogin.Controllers
 {
     [Controller]
-    [Route("[controller]")]
+    [Route("[controller]")]  //teste gitgnore
     
     public class UsuarioController : ControllerBase
     {
