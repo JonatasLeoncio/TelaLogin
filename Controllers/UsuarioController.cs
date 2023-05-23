@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace TelaLogin.Controllers
 {
     [Controller]
-    [Route("[controller]")]  //6
+    [Route("[controller]")]  //7
     
     public class UsuarioController : ControllerBase
     {
