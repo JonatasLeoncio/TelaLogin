@@ -11,8 +11,7 @@ namespace TelaLogin.Validation
               .NotEmpty()
               .EmailAddress();
             RuleFor(user => user.Senha)
-                .NotEmpty()
-                .NotNull()
+                .NotEmpty()               
                 .MinimumLength(3)
                 .MaximumLength(100);
         }

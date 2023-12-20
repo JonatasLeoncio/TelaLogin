@@ -13,19 +13,18 @@ namespace TelaLogin.Validation
         {
             RuleFor(user => user.Nome)
                .NotEmpty()
-               .NotNull()
                .WithMessage("O Campo {PropertyName} é obrigatorio")
-               /* .Length(3, 10)
-                .WithMessage("O nome precisa te de 3 a 100 caracteres")*/
-               .MinimumLength(3).MaximumLength(20);
+                .Length(3, 10);
+             // .WithMessage("O nome precisa te de 3 a 100 caracteres")              
             RuleFor(user => user.Email)
-               .NotEmpty().NotNull()
-               .WithMessage("O Campo email é obrigatorio")
-               .EmailAddress()
-               .WithMessage("O email não  valido");
-            RuleFor(user => user.Senha.Trim())
-               .NotEmpty().NotNull().MinimumLength(3).MaximumLength(100)
-               .WithMessage("Senha precisa de ter de 3 a 100 caracteres");
+               .NotEmpty()
+               //.WithMessage("O Campo email é obrigatorio")
+               .EmailAddress();
+              // .WithMessage("O email não  valido");
+            RuleFor(user => user.Senha)
+               .NotEmpty()
+               .Length(3,10)
+               .WithMessage("{PropertyName} precisa de ter de 3 a 100 caracteres");
 
             /*RuleFor(user => user.Email).Must(VerificaDuplicidade)
                 .WithMessage("Este email já esta cadastrado!");*/

@@ -9,9 +9,11 @@ namespace TelaLogin.Services
 {
     public class TokenServices
     {
+       static private readonly string senhaSecreta = Environment.GetEnvironmentVariable("My_Password_Secrets");//pelo dotenv
         public static string GerarToken(Usuario usuario)
         {
-            var key = Encoding.ASCII.GetBytes(Settings.Secret);
+            var key = Encoding.ASCII.GetBytes(senhaSecreta);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                    Subject = new ClaimsIdentity(new Claim[]

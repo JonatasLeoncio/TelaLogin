@@ -13,13 +13,13 @@ using TelaLogin.Model;
 namespace TelaLogin.Repository
 {
     public class UsuarioRepository : IUsuarioRepositorio
-    {              
-       
+    {        
         private readonly IConfiguration _configuration;
         public UsuarioRepository(IConfiguration configuration)
         {
             _configuration = configuration;
-            connectionString = configuration.GetConnectionString("MYSQLite");
+            connectionString = _configuration.GetConnectionString("MYSQLite");
+            
         }         
         private  readonly string connectionString;//pelo appsetings
         private readonly string stringDeConexao = Environment.GetEnvironmentVariable("My_Conexao_SQLite");//pelo dotenv

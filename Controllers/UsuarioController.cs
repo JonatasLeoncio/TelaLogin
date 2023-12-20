@@ -9,6 +9,7 @@ using TelaLogin.Interfaces;
 using TelaLogin.ExceptionResponse;
 using TelaLogin.ExceptionResponse.AuxiliarMetodoEntitieExeption;
 using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
 
 namespace TelaLogin.Controllers
 {
@@ -52,10 +53,9 @@ namespace TelaLogin.Controllers
             }
 
         }
-
         
         [HttpGet("Buscar/{id}")]
-        [Authorize]
+        //[Authorize]
         public ActionResult<UsuarioResponse> BuscarUsuario(int id)
         {
             try
@@ -83,7 +83,16 @@ namespace TelaLogin.Controllers
         {
             var result = _validatorUsuario.Validate(usuarioRequest);
             if (result.IsValid == false)
-                return BadRequest(new { Messager = result.Errors.First().ErrorMessage });
+            {
+                List<object> errosDetected = new List<object>();
+                foreach (var item in result.Errors)
+                {
+                    errosDetected.Add(new { PorpertName = item.PropertyName, erroMenssage = item.ErrorMessage, PropertValue = item.AttemptedValue });
+                }
+                return BadRequest(new {Error = errosDetected });
+               // return BadRequest(new { Messager = result.Errors.First().ErrorMessage });
+            }
+           
 
             try
             {
